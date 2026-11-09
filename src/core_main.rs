@@ -106,7 +106,7 @@ pub fn core_main() -> Option<CoreMainAction> {
         if should_check_start_tray && !crate::check_process("--tray", true) {
             #[cfg(target_os = "linux")]
             hbb_common::allow_err!(crate::platform::check_autostart_config());
-            hbb_common::allow_err!(crate::run_me(vec!["--tray"]));
+            // sixian notray: do not spawn tray process
         }
     }
     #[cfg(not(debug_assertions))]
@@ -365,9 +365,8 @@ pub fn core_main() -> Option<CoreMainAction> {
                 return None;
             }
         } else if args[0] == "--tray" {
-            if !crate::check_process("--tray", true) {
-                crate::tray::start_tray();
-            }
+            // sixian notray: tray disabled
+            log::info!("tray disabled in this build");
             return None;
         } else if args[0] == "--install-service" {
             log::info!("start --install-service");
@@ -391,7 +390,7 @@ pub fn core_main() -> Option<CoreMainAction> {
                     .arg(&format!("{} --tray", crate::get_app_name().to_lowercase()))
                     .status()
                     .ok();
-                hbb_common::allow_err!(crate::run_me(vec!["--tray"]));
+                // sixian notray: do not spawn tray process
             }
             #[cfg(windows)]
             crate::privacy_mode::restore_reg_connectivity(true, false);
